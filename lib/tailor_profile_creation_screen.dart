@@ -126,7 +126,6 @@ Future<String?> _uploadImage(File image, String path) async {
   }
 }
 
-
 //   void _saveAndNavigate() async {
 //   if (_formKey.currentState!.validate()) {
 //      final userId = FirebaseAuth.instance.currentUser?.uid;
