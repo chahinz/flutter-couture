@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "779905342485",
+    "project_id": "projet-couture-e2fbe",
+    "storage_bucket": "projet-couture-e2fbe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779905342485:android:92a4b6613f50cd917d021c",
+        "android_client_info": {
+          "package_name": "com.example.flutter_couture"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "779905342485-bd0i5o89v3rldlvjl6opq3p42kn1tppf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_couture",
+            "certificate_hash": "5100c9170c2b6f3273bc1906589b671a33b1d5f6"
+          }
+        },
+        {
+          "client_id": "779905342485-6u07sedt8chgufdomihikacu99hg51lc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-gwePQwuAgw72fKj6BUDK5tIU7rOMH08"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "779905342485-6u07sedt8chgufdomihikacu99hg51lc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "779905342485-nkrkbt2uj5p623m9up4fkqj68af57dtm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterCouture"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

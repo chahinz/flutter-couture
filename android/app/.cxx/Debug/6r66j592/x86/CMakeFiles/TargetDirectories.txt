@@ -1,0 +1,2 @@
+C:/Users/chahi/Downloads/createpofilefortailor-main (1)/createpofilefortailor-main/android/app/.cxx/Debug/6r66j592/x86/CMakeFiles/edit_cache.dir
+C:/Users/chahi/Downloads/createpofilefortailor-main (1)/createpofilefortailor-main/android/app/.cxx/Debug/6r66j592/x86/CMakeFiles/rebuild_cache.dir
