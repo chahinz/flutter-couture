@@ -26,17 +26,17 @@ class _HomePageState extends State<HomePage> {
   final Map<String, List<String>> categoryImages = {
     'Shirts': [
       'images/1.jpg',
-      'images/2.jpg',
-      'images/11.jpg',
-      'images/12.jpg',
-      'images/9.jpg',
-      'images/5.jpg',
-      'images/8.jpg'
+      'images/asset/2.jpg',
+      'images/asset/11.jpg',
+      'images/asset/12.jpg',
+      'images/asset/9.jpg',
+      'images/asset/5.jpg',
+      'images/asset/8.jpg'
     ],
-    'Pants': ['images/3.jpg', 'images/4.jpg', 'images/12.jpg'],
-    'Dresses': ['images/5.jpg', 'images/6.jpg', 'images/13.jpg'],
-    'Jackets': ['images/7.jpg', 'images/8.jpg', 'images/14.jpg'],
-    'Accessories': ['images/9.jpg', 'images/10.jpg', 'images/15.jpg'],
+    'Pants': ['images/asset/3.jpg', 'images/asset/4.jpg', 'images/asset/12.jpg'],
+    'Dresses': ['images/asset/5.jpg', 'images/asset/6.jpg', 'images/asset/13.jpg'],
+    'Jackets': ['images/asset/7.jpg', 'images/asset/8.jpg', 'images/asset/14.jpg'],
+    'Accessories': ['images/asset/9.jpg', 'images/asset/10.jpg', 'images/asset/15.jpg'],
   };
 
   // Function to navigate to the notifications screen

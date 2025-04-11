@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_couture/homepage.dart';
-import 'package:flutter_couture/tailor_profile_creation_screen.dart'; // Add this import
+import 'package:flutter_couture/tailorhomepage.dart';
+import 'package:flutter_couture/tailor_profile_creation_screen.dart'; 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
 
 class TailorSignUpScreen extends StatefulWidget {
   const TailorSignUpScreen({super.key});
@@ -102,7 +103,7 @@ class _TailorSignUpScreenState extends State<TailorSignUpScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Homepage()),
+        MaterialPageRoute(builder: (context) => Homepagetailor()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

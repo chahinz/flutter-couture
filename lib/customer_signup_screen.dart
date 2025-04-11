@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_couture/homepage.dart';
-
+import 'package:flutter_couture/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'main_screen.dart';
 
 class CustomerSignUpScreen extends StatefulWidget {
   const CustomerSignUpScreen({super.key});
@@ -30,6 +30,7 @@ void signUp(String email, String password, String username, String accountType) 
     );
 
     String uid = userCredential.user!.uid;
+
     await FirebaseFirestore.instance.collection('users').doc(uid).set({
       'email': email,
       'username': username,
@@ -42,10 +43,16 @@ void signUp(String email, String password, String username, String accountType) 
       'accountType': accountType,
       'password' : password, 
     });
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => Homepage()),
-    );
+    if (accountType == 'Customer') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()), 
+      );
+    }
+    // Navigator.pushReplacement(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => MainScreen()),
+    // );
 
   } catch (e) {
     print("Error: password must be at least 8 characters"); 
@@ -70,7 +77,6 @@ Future<void> signInWithGoogle() async {
         idToken: googleAuth.idToken,
       );
 
-
       UserCredential userCredential = await _auth.signInWithCredential(credential);
     User? user = userCredential.user;
 
@@ -85,10 +91,9 @@ Future<void> signInWithGoogle() async {
         });
       }
     }
-
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Homepage()),
+        MaterialPageRoute(builder: (context) => MainScreen()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

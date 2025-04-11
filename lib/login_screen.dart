@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_couture/forgotpassword.dart';
-import 'package:flutter_couture/homepage.dart';
+import 'package:flutter_couture/tailorhomepage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import  'package:flutter_couture/home_page.dart';
+import 'main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,15 +26,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void signIn() async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      Navigator.pushReplacement(
+    String uid = userCredential.user!.uid;
+
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    if (userDoc.exists) {
+      String accountType = userDoc.get('accountType');
+
+      if (accountType == 'Customer') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen() ),
+        );
+      } else if (accountType == 'Tailor') {
+        Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Homepage()),
+        MaterialPageRoute(builder: (context) => Homepagetailor()),
       );
+      }
+    }
     } on FirebaseAuthException catch (e) {
       String errorMessage = "An error occurred";
 
@@ -58,10 +75,11 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       await _auth.signInWithCredential(credential);
+      
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Homepage()),
+        MaterialPageRoute(builder: (context) => Homepagetailor()), // il faut chnager le path selon le custom !!!!
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
