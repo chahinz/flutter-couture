@@ -12,9 +12,9 @@ class CategoryExplorePage extends StatefulWidget {
 
 class _CategoryExplorePageState extends State<CategoryExplorePage> {
   final List<String> allImages = [
-    'images/1.jpg', 'images/2.jpg', 'images/3.jpg', 'images/4.jpg',
-    'images/5.jpg', 'images/6.jpg', 'images/7.jpg', 'images/8.jpg',
-    'images/9.jpg', 'images/10.jpg', 'images/11.jpg', 'images/12.jpg',
+    'images/asset/1.jpg', 'images/asset/2.jpg', 'images/asset/3.jpg', 'images/asset/4.jpg',
+    'images/asset/5.jpg', 'images/asset/6.jpg', 'images/asset/7.jpg', 'images/asset/8.jpg',
+    'images/asset/9.jpg', 'images/asset/10.jpg', 'images/asset/11.jpg', 'images/asset/12.jpg',
   ];
 
   // قائمة لحالة الإعجاب بالصور
@@ -48,11 +48,16 @@ class _CategoryExplorePageState extends State<CategoryExplorePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => DetailPage(
-                      imagePath: imagePath,
+                      // imagePath: imagePath,
                       title: widget.subCategoryTitle,
                       price: "12000 DA",
                       description: "Modern kaftan with a beautiful touch.",
                       fabricType: "Silk",
+                      modelId: "",
+                      tailorId: "",
+                       // mofiy this
+                       availableColors: [], // list of hex strings
+                      availableSizes: [],
                     ),
                   ),
                 );

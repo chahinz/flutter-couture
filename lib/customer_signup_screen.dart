@@ -25,6 +25,7 @@ class _CustomerSignUpScreenState extends State<CustomerSignUpScreen> {
 void signUp(String email, String password, String username, String accountType) async {
   try {
     UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+
       email: email,
       password: password,
     );
@@ -32,16 +33,20 @@ void signUp(String email, String password, String username, String accountType) 
     String uid = userCredential.user!.uid;
 
     await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'id': uid,
       'email': email,
       'username': username,
       'accountType': accountType,
       'password' : password, 
+      'address' : ''
     });
     await FirebaseFirestore.instance.collection('customer').doc(uid).set({
+      'id': uid,
       'email': email,
       'username': username,
       'accountType': accountType,
       'password' : password, 
+      'address' : ''
     });
     if (accountType == 'Customer') {
       Navigator.pushReplacement(
@@ -88,6 +93,7 @@ Future<void> signInWithGoogle() async {
           'email': user.email,
           'username': user.displayName ?? "No Name",
           'accountType': 'Customer',
+          'address': ' ',
         });
       }
     }

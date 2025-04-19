@@ -10,10 +10,10 @@ class LikePage extends StatefulWidget {
 
 class _LikePageState extends State<LikePage> {
   final List<String> allImages = [
-    'images/1.jpg', 'images/2.jpg', 'images/3.jpg', 'images/4.jpg',
-    'images/5.jpg', 'images/6.jpg', 'images/7.jpg', 'images/8.jpg',
-    'images/9.jpg', 'images/10.jpg', 'images/11.jpg', 'images/12.jpg',
-    'images/13.jpg', 'images/14.jpg', 'images/15.jpg'
+    'images/1.jpg', 'images/asset/2.jpg', 'images/asset/3.jpg', 'images/asset/4.jpg',
+    'images/asset/5.jpg', 'images/asset/6.jpg', 'images/asset/7.jpg', 'images/asset/8.jpg',
+    'images/asset/9.jpg', 'images/asset/10.jpg', 'images/asset/11.jpg', 'images/asset/12.jpg',
+    'images/asset/13.jpg', 'images/asset/14.jpg', 'images/asset/15.jpg'
   ];
 
   void _removeImage(String imagePath) {
@@ -21,6 +21,7 @@ class _LikePageState extends State<LikePage> {
       allImages.remove(imagePath);
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -45,11 +46,15 @@ class _LikePageState extends State<LikePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => DetailPage(
-                      imagePath: imagePath,
+                      // imagePath: imagePath,
+                      tailorId: "",
+                      modelId: "",
                       title: "Kaftan",
                       price: "12000 DA",
                       description: "Modern kaftan with a beautiful touch.",
                       fabricType: "Silk",
+                      availableSizes: [],
+                      availableColors:  [],
                     ),
                   ),
                 );

@@ -10,15 +10,16 @@ class CategoriesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // List of categories with their titles and corresponding image paths
     final List<Map<String, String>> categories = [
-      {'title': "Men", 'image': 'images/menswear2.jpg'},
-      {'title': "Women", 'image': 'images/womenswear2.jpg'},
-      {'title': "Kids", 'image': 'images/kidswear.jpg'},
-      {'title': "Babies", 'image': 'images/kidswear2.jpg'},
-      {'title': "Knitting", 'image': 'images/fabricbased.jpg'},
-      {'title': "Accessories & Add-ons", 'image': 'images/accessories.jpg'},
-      {'title': "Graduation", 'image': 'images/55.jpg'},
-      {'title': "Home textile", 'image': 'images/hometextiles.jpg'},
+      {'title': "Men", 'image': 'images/asset/menswear2.jpg'},
+      {'title': "Women", 'image': 'images/asset/womenswear2.jpg'},
+      {'title': "Kids", 'image': 'images/asset/kidswear.jpg'},
+      {'title': "Babies", 'image': 'images/asset/kidswear2.jpg'},
+      {'title': "Knitting", 'image': 'images/asset/fabricbased.jpg'},
+      {'title': "Accessories & Add-ons", 'image': 'images/asset/accessories.jpg'},
+      {'title': "Graduation", 'image': 'images/asset/55.jpg'},
+      {'title': "Home textile", 'image': 'images/asset/hometextiles.jpg'},
     ];
+
 
     return Scaffold(
       appBar: AppBar(

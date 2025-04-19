@@ -32,14 +32,17 @@ class _TailorSignUpScreenState extends State<TailorSignUpScreen> {
         password: password,
       );
 
+
       String uid = userCredential.user!.uid;
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'id': uid, 
         'email': email,
         'username': username,
         'accountType': accountType,
         'password': password,
       });
        await FirebaseFirestore.instance.collection('tailors').doc(uid).set({
+        'id': uid, 
         'email': email,
         'username': username,
         'accountType': accountType,
@@ -94,6 +97,7 @@ class _TailorSignUpScreenState extends State<TailorSignUpScreen> {
               .collection('users')
               .doc(user.uid)
               .set({
+            'id': user.uid,
             'email': user.email,
             'username': user.displayName ?? "No Name",
             'accountType': 'tailor',

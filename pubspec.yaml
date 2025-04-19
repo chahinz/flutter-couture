@@ -42,6 +42,8 @@ dependencies:
   image_picker: ^1.1.2
   firebase_storage: ^12.4.2
   flutter_rating_bar: ^4.0.1
+  flutter_staggered_grid_view: ^0.7.0
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
@@ -123,6 +125,7 @@ flutter:
     - images/asset/51.jpg
     - images/asset/53.jpg
     - images/asset/54.jpg
+    - images/asset/55.jpg
     - images/asset/57.jpg
     - images/asset/58.jpg
     - images/asset/59.jpg
@@ -152,6 +155,15 @@ flutter:
     - images/asset/83.jpg
     - images/asset/84.jpg
     - images/asset/85.jpg
+    - images/asset/accessories.jpg
+    - images/asset/fabricbased.jpg
+    - images/asset/hometextiles.jpg
+    - images/asset/kidswear.jpg
+    - images/asset/kidswear2.jpg
+    - images/asset/menswear2.jpg
+    - images/asset/occassionwear.jpg
+    - images/asset/womenswear2.jpg
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import  'package:flutter_couture/home_page.dart';
+import 'tailor_profile_creation_screen.dart';
+import 'main_screentailor.dart';
 import 'main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -45,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
       } else if (accountType == 'Tailor') {
         Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Homepagetailor()),
+        MaterialPageRoute(builder: (context) => MainScreentailor()),
       );
       }
     }

@@ -64,12 +64,12 @@ class OrdersList extends StatelessWidget {
       {
         "title": "Kafton",
         "price": "50000 DA",
-        "image": "images/2.jpg",
+        "image": "images/asset/2.jpg",
       },
       {
         "title": "Skirt",
         "price": "6000 DA",
-        "image": "images/3.jpg",
+        "image": "images/asset/3.jpg",
       },
     ];
 
@@ -112,11 +112,15 @@ class OrdersList extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => DetailPage(
-                        imagePath: order["image"]!,
+                        tailorId: "",
+                        // imagePath: order["image"]!,
+                        modelId: "",
                         title: order["title"]!,
                         price: order["price"]!,
                         description: "High-quality fabric with elegant design.",
                         fabricType: "Silk",
+                        availableColors: [], // list of hex strings
+      availableSizes: [],
                       ),
                     ),
                   );

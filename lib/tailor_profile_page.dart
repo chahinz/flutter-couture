@@ -53,6 +53,7 @@ class _TailorProfilePageState extends State<TailorProfilePage>
     _tabController.dispose();
     super.dispose();
   }
+  
 
   @override
   Widget build(BuildContext context) {
