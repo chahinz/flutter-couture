@@ -317,6 +317,7 @@ class DetailPage extends StatefulWidget {
   final String tailorId; 
   final List<String> availableColors;
   final List<String> availableSizes;
+  final int progress; 
 
   const DetailPage({
     Key? key,
@@ -324,6 +325,7 @@ class DetailPage extends StatefulWidget {
     required this.modelId,
     required this.title,
     required this.price,
+    this.progress = 0,
     required this.description,
     required this.fabricType,
     this.availableColors = const [], 
@@ -382,7 +384,7 @@ Widget _buildColorOption(Color color, String hexCode) {
 
 String Idcustomer = FirebaseAuth.instance.currentUser?.uid ?? 'default_user_id';
 
- void placeOrder(String userId, String tailorId, String modelId, List<String> colors, List<String> sizes, String initialPrice, String modifiedPrice, String note, String categoryId) async {
+ void placeOrder(String userId, String tailorId, String modelId, List<String> colors, List<String> sizes, String initialPrice, String modifiedPrice, String note, String categoryId , int progress) async {
     try {
       Booking newBooking = Booking(
         id: FirebaseFirestore.instance.collection('bookings').doc().id,
@@ -397,6 +399,7 @@ String Idcustomer = FirebaseAuth.instance.currentUser?.uid ?? 'default_user_id';
         createdAt: DateTime.now(),
         categoryId: categoryId,
         note: note,
+        progress: 0,
       );
       Map<String, dynamic> bookingMap = {
         'userId': newBooking.userId,
@@ -410,6 +413,7 @@ String Idcustomer = FirebaseAuth.instance.currentUser?.uid ?? 'default_user_id';
         'createdAt': newBooking.createdAt,
         'categoryId': newBooking.categoryId,
         'note': newBooking.note,
+        'progres': "0",
       };
       await FirebaseFirestore.instance.collection('bookings').add(bookingMap);
       print("Order placed successfully!");
@@ -663,18 +667,42 @@ Row(
                     // ),
 
                      child: ElevatedButton(
+                      // onPressed: () {
+                      //   String userId = Idcustomer; 
+                      //   String tailorId = widget.tailorId;
+                      //   String modelId = widget.modelId;
+                      //   List<String> colors = _selectedColors;
+                      //   List<String> sizes = [_selectedSize];
+                      //   String initialPrice = widget.price; 
+                      //   String modifiedPrice = widget.price; 
+                      //   String note = _notesController.text;
+                      //   String categoryId = 'categoryId_value'; 
+                      //   placeOrder(userId, tailorId, modelId, colors, sizes, initialPrice, modifiedPrice, note, categoryId);
+                      // },
                       onPressed: () {
-                        String userId = Idcustomer; 
-                        String tailorId = widget.tailorId;
-                        String modelId = widget.modelId;
-                        List<String> colors = _selectedColors;
-                        List<String> sizes = [_selectedSize];
-                        String initialPrice = widget.price; 
-                        String modifiedPrice = widget.price; 
-                        String note = _notesController.text;
-                        String categoryId = 'categoryId_value'; 
-                        placeOrder(userId, tailorId, modelId, colors, sizes, initialPrice, modifiedPrice, note, categoryId);
-                      },
+  String userId = Idcustomer;
+  String tailorId = widget.tailorId;
+  String modelId = widget.modelId;
+  List<String> colors = _selectedColors;
+  List<String> sizes = [_selectedSize];
+  String initialPrice = widget.price;
+  String modifiedPrice = widget.price;
+  String note = _notesController.text;
+  String categoryId = '6';
+  int progress = 0;
+
+  print("🧾 Placing order with:");
+  print("User ID: $userId");
+  print("Tailor ID: $tailorId");
+  print("Model ID: $modelId");
+  print("Colors: $colors");
+  print("Sizes: $sizes");
+  print("Initial Price: $initialPrice");
+  print("Note: $note");
+
+
+  placeOrder(userId, tailorId, modelId, colors, sizes, initialPrice, modifiedPrice, note, categoryId , progress);
+},
                       child: Text("Order"),
                     ),
                   ),

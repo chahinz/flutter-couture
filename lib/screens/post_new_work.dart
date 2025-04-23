@@ -120,10 +120,24 @@ List<Map<String, dynamic>> subcategories = [];
 //   await FirebaseFirestore.instance.collection('posts').add(postJson);
 // }
 
+
+
+// Future<void> saveModel(Model model) async {
+//   try {
+//     final modelJson = model.toMap(); 
+//     await FirebaseFirestore.instance.collection('models').add(modelJson);
+//   } catch (e) {
+//     print("🔥 Error saving model: $e");
+//     throw Exception("Error saving model: $e");
+//   }
+// }
+
 Future<void> saveModel(Model model) async {
   try {
-    final modelJson = model.toMap(); 
-    await FirebaseFirestore.instance.collection('models').add(modelJson);
+    final docRef = FirebaseFirestore.instance.collection('models').doc(); 
+    model.modelId = docRef.id; 
+    final modelJson = model.toMap();
+    await docRef.set(modelJson); // Save using the custom ID
   } catch (e) {
     print("🔥 Error saving model: $e");
     throw Exception("Error saving model: $e");
@@ -483,18 +497,13 @@ onPressed: () async {
 
     print('Model Data: ${newModel.toMap()}');
 
-
-    // Save to Firestore
-
-
-
-    await saveModel(newModel);
+    // await saveModel(newModel);
+    await modelDoc.set(newModel.toMap());
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Model uploaded!", style: GoogleFonts.poppins())),
     );
 
-    // Optional: Clear form
     setState(() {
       _imageBytes = null;
       titleController.clear();

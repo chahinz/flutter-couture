@@ -213,7 +213,7 @@ class TailorProfilePageState extends State<TailorProfilePage> {
 
     setState(() {
       userModels = snapshot.docs
-          .map((doc) => Model.fromMap(doc.data()))
+          .map((doc) => Model.fromJson(doc.data()))
           .toList();
     });
   }
@@ -360,7 +360,7 @@ class TailorProfilePageState extends State<TailorProfilePage> {
                     }
 
                     final models = modelSnapshot.data!.docs.map((doc) {
-                      return Model.fromMap(doc.data() as Map<String, dynamic>);
+                      return Model.fromJson(doc.data() as Map<String, dynamic>);
                     }).toList();
 
                     return _buildPortfolioGrid(models);

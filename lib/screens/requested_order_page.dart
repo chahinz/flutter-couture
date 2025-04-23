@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -8,8 +9,11 @@ class RequestedOrderPage extends StatefulWidget {
   final String color;
   final String size;
   final String notes;
+  final String bookingId;
+  final int progress;
 
   const RequestedOrderPage({
+    required this.bookingId,
     super.key,
     required this.title,
     required this.price,
@@ -17,6 +21,7 @@ class RequestedOrderPage extends StatefulWidget {
     required this.color,
     required this.size,
     required this.notes,
+    required this.progress,
   });
 
   @override
@@ -45,7 +50,36 @@ class _RequestedOrderPageState extends State<RequestedOrderPage> {
     super.dispose();
   }
 
-  
+//   Future<void> updateBookingStatus(String bookingId, String status , {String? price}) async {
+//   try {
+
+//     final bookingRef = FirebaseFirestore.instance.collection('bookings').doc(bookingId);
+//     await bookingRef.update({
+//       'status': status.toLowerCase(),
+//     });
+    
+//     print('Booking status updated to: $status');
+//   } catch (e) {
+//     print('Error updating booking status: $e');
+//   }
+// }
+
+Future<void> updateBookingStatus(String bookingId, String status, {String? price}) async {
+  try {
+    final bookingRef = FirebaseFirestore.instance.collection('bookings').doc(bookingId);
+    Map<String, dynamic> updates = {
+      'status': status.toLowerCase(),
+    };
+    if (price != null && price.isNotEmpty) {
+      updates['price'] = price;
+    }
+    await bookingRef.update(updates);
+    print('Booking status and/or price updated.');
+  } catch (e) {
+    print('Error updating booking: $e');
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +155,29 @@ class _RequestedOrderPageState extends State<RequestedOrderPage> {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
+                    // onPressed: () {
+                    //    if (_isPriceChanged) {
+                    //         updateBookingStatus(widget.bookingId, 'Tailoring', price: _priceController.text);
+                    //   } else {
+                    //         updateBookingStatus(widget.bookingId, 'Tailoring');
+                    //   }
+                    //   // updateBookingStatus(widget.bookingId, 'Tailoring');
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //       content: Text(_isPriceChanged
+                    //           ? "Order Accepted with New Price: ${_priceController.text}"
+                    //           : "Order Accepted"),
+                    //     ),
+                    //   );
+                    //   Navigator.pop(context);
+                    // },
+                    onPressed: () async {
+                      await updateBookingStatus(
+                        widget.bookingId,
+                        'Tailoring',
+                        price: _isPriceChanged ? _priceController.text : null,
+                      );
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(_isPriceChanged
@@ -129,6 +185,7 @@ class _RequestedOrderPageState extends State<RequestedOrderPage> {
                               : "Order Accepted"),
                         ),
                       );
+                      Navigator.pop(context, true);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor:const Color.fromARGB(255, 130, 178, 119),
@@ -144,9 +201,11 @@ class _RequestedOrderPageState extends State<RequestedOrderPage> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
+                      updateBookingStatus(widget.bookingId, 'Canceled');
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text("Order Rejected")),
                       );
+                      Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor:const Color.fromARGB(255, 205, 114, 114),

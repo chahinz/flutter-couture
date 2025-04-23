@@ -846,14 +846,278 @@
 // }
 
 
+
+// ///////////////////////////this one works 
+// import 'package:flutter/material.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:google_fonts/google_fonts.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+
+// import 'update_order.dart';
+// import 'requested_order_page.dart';
+// import '../models/post_model.dart';
+// import '../models/bookins.dart';
+
+// class ManageOrders extends StatefulWidget {
+//   const ManageOrders({super.key});
+
+//   @override
+//   State<ManageOrders> createState() => _ManageOrdersState();
+// }
+
+// class _ManageOrdersState extends State<ManageOrders> {
+//   final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return DefaultTabController(
+//       length: 4,
+//       child: Scaffold(
+//         appBar: AppBar(
+//           title: Center(
+//             child: Text(
+//               "My Orders",
+//               style: GoogleFonts.poppins(
+//                 fontSize: 20,
+//                 fontWeight: FontWeight.bold,
+//               ),
+//             ),
+//           ),
+//           backgroundColor: const Color.fromARGB(255, 245, 243, 249),
+//           foregroundColor: Colors.black,
+//           bottom: TabBar(
+//             indicatorColor: const Color.fromARGB(255, 163, 119, 178),
+//             labelColor: const Color.fromARGB(255, 163, 119, 178),
+//             unselectedLabelColor: Colors.black,
+//             labelStyle: GoogleFonts.poppins(
+//               fontSize: 16,
+//               fontWeight: FontWeight.w600,
+//             ),
+//             tabs: const [
+//               Tab(text: "Received"),
+//               Tab(text: "Tailoring"),
+//               Tab(text: "Completed"),
+//               Tab(text: "Canceled"),
+//             ],
+//           ),
+//         ),
+//         body: const TabBarView(
+//           children: [
+//             OrdersList(orderType: "view Request", statusFilter: "requested"),
+//             OrdersList(orderType: "Update", statusFilter: "Tailoring"),
+//             OrdersList(orderType: "Review", statusFilter: "Completed"),
+//             OrdersList(orderType: "Canceled", statusFilter: "Canceled"),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class OrdersList extends StatefulWidget {
+//   final String orderType;
+//   final String statusFilter;
+
+//   const OrdersList({
+//     super.key,
+//     required this.orderType,
+//     required this.statusFilter,
+//   });
+
+//   @override
+//   State<OrdersList> createState() => _OrdersListState();
+// }
+
+// class _OrdersListState extends State<OrdersList> {
+//   late Future<List<Map<String, dynamic>>> ordersFuture;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     ordersFuture = fetchBookingsWithModelData(
+//       FirebaseAuth.instance.currentUser!.uid,
+//       widget.statusFilter,
+//     );
+    
+//   }
+
+
+//   String mapOrderTypeToStatus(String orderType) {
+//   switch (orderType.toLowerCase()) {
+//     case "view request":
+//       return "requested";
+//     case "update":
+//       return "accepted";
+//     // add more mappings as needed
+//     default:
+//       return ""; // fallback
+//   }
+// }
+
+// Future<List<Map<String, dynamic>>> fetchBookingsWithModelData(
+//   String tailorId, String statusFilter) async {
+  
+//   final querySnapshot = await FirebaseFirestore.instance
+//       .collection('bookings')
+//       .where('tailorId', isEqualTo: tailorId)
+//       .where('status', isEqualTo: statusFilter.toLowerCase().trim()) 
+//       .get();
+
+//   print("Status filter: '${statusFilter}'");
+//   print('Number of bookings found: ${querySnapshot.docs.length}');
+
+//   if (querySnapshot.docs.isEmpty) {
+//     print('No bookings matched the query.');
+//   }
+
+//   List<Map<String, dynamic>> orders = [];
+
+//   for (var doc in querySnapshot.docs) {
+//     final booking = Booking.fromFirestore(doc);
+//     print('Booking found: ${booking.id}');
+    
+//     // Clean up modelId for any potential whitespaces
+//     final cleanedModelId = booking.modelId.trim();
+//     print("🔍 Checking for modelId: ${cleanedModelId}");
+
+//     final modelQuery = await FirebaseFirestore.instance
+//         .collection('models')
+//         .where('idModel', isEqualTo: cleanedModelId) 
+//         .limit(1)
+//         .get();
+
+//     print('Model query docs: ${modelQuery.docs.length}');  // Check how many docs returned
+//     modelQuery.docs.forEach((doc) {
+//       print('Model doc data: ${doc.data()}');  // Print all document data
+//     });
+
+//     if (modelQuery.docs.isNotEmpty) {
+//       final post = Post.fromJson(modelQuery.docs.first.data());
+//       print('✅ Model found: ${post.name}');
+//       print("🔍 Booking ID: ${booking.id}, modelId: ${booking.modelId}");
+
+//       orders.add({
+//         'booking': booking,
+//         'model': post,
+//       });
+//     } else {
+//       print('❌ Model not found for booking ID: ${booking.id} with modelId: ${booking.modelId}');
+//     }
+//   }
+
+//   print("Current User ID: ${FirebaseAuth.instance.currentUser!.uid}");
+
+//   return orders;
+// }
+
+
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return FutureBuilder<List<Map<String, dynamic>>>(
+//       future: ordersFuture,
+//       builder: (context, snapshot) {
+//         if (snapshot.connectionState == ConnectionState.waiting) {
+//           return const Center(child: CircularProgressIndicator());
+//         }
+
+//         if (snapshot.hasError) {
+//           return Center(child: Text("Error: ${snapshot.error}"));
+//         }
+
+//         final orders = snapshot.data ?? [];
+
+//         if (orders.isEmpty) {
+//           return const Center(child: Text("No orders found."));
+//         }
+        
+
+//         return ListView.builder(
+//           padding: const EdgeInsets.all(10),
+//           itemCount: orders.length,
+//           itemBuilder: (context, index) {
+//             final booking = orders[index]['booking'] as Booking;
+//             final model = orders[index]['model'] as Post;
+
+//             return ListTile(
+//               contentPadding: const EdgeInsets.symmetric(
+//                 vertical: 10,
+//                 horizontal: 15,
+//               ),
+//               title: Text(
+//                 model.name,
+//                 style: GoogleFonts.poppins(
+//                   fontWeight: FontWeight.bold,
+//                   fontSize: 18,
+//                 ),
+//               ),
+//               subtitle: Text(
+//                 "${booking.modifiedprice} DA",
+//                 style: GoogleFonts.poppins(
+//                   color: Colors.grey,
+//                   fontSize: 16,
+//                 ),
+//               ),
+//               trailing: (widget.orderType == "Update" ||
+//                       widget.orderType == "view Request")
+//                   ? ElevatedButton(
+//                       style: ElevatedButton.styleFrom(
+//                         backgroundColor:
+//                             const Color.fromARGB(255, 163, 119, 178),
+//                         padding: const EdgeInsets.symmetric(
+//                           horizontal: 20,
+//                           vertical: 10,
+//                         ),
+//                       ),
+//                       onPressed: () {
+//                         final destination = widget.orderType == "Update"
+//                             ? UpdateOrderPage(
+//                                 title: model.name,
+//                                 price: booking.modifiedprice,
+//                                 color: booking.colors?.join(', ') ?? '',
+//                                 size: booking.sizes?.join(', ') ?? '',
+
+//                                 notes: booking.note,
+//                               )
+//                             : RequestedOrderPage(
+//                                 title: model.name,
+//                                 price: booking.initialprice,
+//                                 color: booking.colors?.join(', ') ?? '',
+//                                 size: booking.sizes?.join(', ') ?? '',
+//                                 notes: booking.note,
+//                               );
+
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(builder: (context) => destination),
+//                         );
+//                       },
+//                       child: Text(
+//                         widget.orderType,
+//                         style: GoogleFonts.poppins(
+//                           color: Colors.white,
+//                           fontSize: 16,
+//                         ),
+//                       ),
+//                     )
+//                   : null,
+//             );
+//           },
+//         );
+//       },
+//     );
+//   }
+// }
+
+
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_couture/models/model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'update_order.dart';
 import 'requested_order_page.dart';
-import '../models/post_model.dart';
 import '../models/bookins.dart';
 
 class ManageOrders extends StatefulWidget {
@@ -936,117 +1200,83 @@ class _OrdersListState extends State<OrdersList> {
       FirebaseAuth.instance.currentUser!.uid,
       widget.statusFilter,
     );
-    
   }
-
 
   String mapOrderTypeToStatus(String orderType) {
-  switch (orderType.toLowerCase()) {
-    case "view request":
-      return "requested";
-    case "update":
-      return "accepted";
-    // add more mappings as needed
-    default:
-      return ""; // fallback
+    switch (orderType.toLowerCase()) {
+      case "view request":
+        return "requested";
+      case "update":
+        return "accepted";
+      default:
+        return "";
+    }
   }
-}
-
 
 
 Future<List<Map<String, dynamic>>> fetchBookingsWithModelData(
-  String tailorId, String statusFilter) async {
-  
-  // Query with statusFilter applied
+    String tailorId, String statusFilter) async {
   final querySnapshot = await FirebaseFirestore.instance
       .collection('bookings')
       .where('tailorId', isEqualTo: tailorId)
-      .where('status', isEqualTo: statusFilter.toLowerCase().trim()) // filter by status
+      .where('status', isEqualTo: statusFilter.toLowerCase().trim())
       .get();
 
-  print("Status filter: '${widget.statusFilter}'");
-
-  // Check the number of bookings found
+  print("Status filter: '${statusFilter}'");
   print('Number of bookings found: ${querySnapshot.docs.length}');
-  if (querySnapshot.docs.isEmpty) {
-    print('No bookings matched the query.');
-  }
 
   List<Map<String, dynamic>> orders = [];
 
   for (var doc in querySnapshot.docs) {
-    final booking = Booking.fromFirestore(doc);
-    print('Booking found: ${booking.id}');
+    try {
+      final booking = Booking.fromFirestore(doc);
+      print('Booking found: ${booking.id}');
+      final cleanedModelId = booking.modelId.trim();
 
-    // final modelDoc = await FirebaseFirestore.instance
-    //     .collection('models')
-    //     .doc(booking.modelId)
-    //     .get();
+      final modelQuery = await FirebaseFirestore.instance
+          .collection('models')
+          .where('idModel', isEqualTo: cleanedModelId)
+          .limit(1)
+          .get();
 
-    // if (modelDoc.exists) {
-    //   final post = Post.fromJson(modelDoc.data()!);
-    //   print('Model found: ${post.name}');
+      if (modelQuery.docs.isEmpty) {
+        print("❌ No model found for: ${cleanedModelId}");
+        continue;
+      }
 
-    //   orders.add({
-    //     'booking': booking,
-    //     'model': post,
-    //   });
-    // } else {
-    //   print('Model not found for booking ID: ${booking.id}');
-    // }
+      final modelData = modelQuery.docs.first.data();
 
-    final modelQuery = await FirebaseFirestore.instance
-    .collection('models')
-    .where('idModel', isEqualTo: booking.modelId) 
-    .limit(1)
-    .get();
+      final List<String> modelColors = modelData['colors'] is List
+          ? List<String>.from(modelData['colors'])
+          : <String>[];
 
-if (modelQuery.docs.isNotEmpty) {
-  final post = Post.fromJson(modelQuery.docs.first.data());
-  print('✅ Model found: ${post.name}');
-  print("🔍 Booking ID: ${booking.id}, modelId: ${booking.modelId}");
+      final List<String> modelSizes = modelData['sizes'] is List
+          ? List<String>.from(modelData['sizes'])
+          : <String>[];
 
-  orders.add({
-    'booking': booking,
-    'model': post,
-  });
-} else {
-  print('❌ Model not found for booking ID: ${booking.id}');
-}
+      final model = Model.fromJson(modelData);
 
+      orders.add({
+        'booking': booking,
+        'model': model,
+        'modelColors': modelColors,
+        'modelSizes': modelSizes,
+      });
+
+      print('✅ Model found: ${model.name}');
+      
+    } catch (e) {
+      print('🚨 Error handling booking: ${e.toString()}');
+    }
   }
 
-  var bookings = await FirebaseFirestore.instance.collection('bookings').where('status', isEqualTo: 'requested').get();
-
-if (bookings.docs.isEmpty) {
-  print("No bookings found");
-} else {
-  var bookingData = bookings.docs.map((doc) => doc.data()).toList();
-  print("Number of bookings found: ${bookingData.length}");
-}
-
-  print("Current User ID: ${FirebaseAuth.instance.currentUser!.uid}");
-
-
-
-
-  List<Map<String, dynamic>> bookingsList = [];
-
-// After fetching the data
-if (bookings != null && bookings.docs.isNotEmpty) {
-  bookingsList = bookings.docs.map((doc) => doc.data()).toList();
-}
-
-// Now, bookingsList is an iterable and can be used for displaying
-
-
-
+  print("✅ Finished fetching. Total valid bookings: ${orders.length}");
   return orders;
 }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Map<String, dynamic>>>(
+    return FutureBuilder<List<Map<String, dynamic>>>( 
       future: ordersFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -1062,14 +1292,13 @@ if (bookings != null && bookings.docs.isNotEmpty) {
         if (orders.isEmpty) {
           return const Center(child: Text("No orders found."));
         }
-        
 
         return ListView.builder(
           padding: const EdgeInsets.all(10),
           itemCount: orders.length,
           itemBuilder: (context, index) {
             final booking = orders[index]['booking'] as Booking;
-            final model = orders[index]['model'] as Post;
+            final model = orders[index]['model'] as Model;
 
             return ListTile(
               contentPadding: const EdgeInsets.symmetric(
@@ -1104,18 +1333,22 @@ if (bookings != null && bookings.docs.isNotEmpty) {
                       onPressed: () {
                         final destination = widget.orderType == "Update"
                             ? UpdateOrderPage(
+                                bookingId: booking.id,
                                 title: model.name,
                                 price: booking.modifiedprice,
-                                color: booking.colors.join(', '),
-                                size: booking.sizes.join(', '),
+                                color: booking.colors?.join(', ') ?? '',
+                                size: booking.sizes?.join(', ') ?? '',
                                 notes: booking.note,
+                                progress : 0,
                               )
                             : RequestedOrderPage(
+                                bookingId: booking.id,
                                 title: model.name,
                                 price: booking.initialprice,
-                                color: booking.colors.join(', '),
-                                size: booking.sizes.join(', '),
+                                color: booking.colors?.join(', ') ?? '',
+                                size: booking.sizes?.join(', ') ?? '',
                                 notes: booking.note,
+                                progress : 0,
                               );
 
                         Navigator.push(
@@ -1139,4 +1372,3 @@ if (bookings != null && bookings.docs.isNotEmpty) {
     );
   }
 }
-

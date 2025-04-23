@@ -570,29 +570,6 @@ class _HomePageState extends State<HomePage> {
     _fetchModels();
   }
 
-  // Future<void> _fetchModels() async {
-  //   try {
-  //     final snapshot = await _firestore.collection('models').get();
-  //     setState(() {
-  //       _models = snapshot.docs.map((doc) {
-  //         var modelData = doc.data() as Map<String, dynamic>;
-
-  //         modelData['colors'] = modelData['colors'] != null
-  //             ? List<String>.from(modelData['colors'].map((e) => e.toString()))
-  //             : [];
-
-  //         modelData['sizes'] = modelData['sizes'] != null
-  //             ? List<String>.from(modelData['sizes'].map((e) => e.toString()))
-  //             : [];
-
-  //         return Model.fromMap(modelData); 
-  //       }).toList();
-  //     });
-  //   } catch (e) {
-  //     print('Error fetching models: $e');
-  //   }
-  // }
-
 
   Future<void> _fetchModels() async {
   try {
@@ -611,7 +588,7 @@ class _HomePageState extends State<HomePage> {
             ? List<String>.from(modelData['sizes'].map((e) => e.toString()))
             : [];
 
-        return Model.fromMap(modelData); 
+        return Model.fromJson(modelData); 
       }).toList();
     });
   } catch (e) {
@@ -761,9 +738,9 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(10),
               itemBuilder: (context, index) {
                 final model = _models[index];
-                final String modelId = model.modelId ?? 'unknown'; // Fetch model ID
-                final String name = model.name ?? 'Unknown';
-                final String price = model.price ?? 'N/A';
+                final String modelId = model.modelId ?? 'unknown'; 
+                final String name = model.name ;
+                final String price = model.price;
                 final String description = model.description ?? 'No description available';
                 final String tailorId = model.idTailor ?? '';
 
