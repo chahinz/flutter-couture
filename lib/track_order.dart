@@ -796,11 +796,11 @@ class _TrackOrderPageState extends State<TrackOrderPage> {
     final orderData = widget.orderData;
 
     int progress = 0;
-    if (orderData['progres'] != null) {
-      if (orderData['progres'] is int) {
-        progress = orderData['progres'];
-      } else if (orderData['progres'] is String) {
-        progress = int.tryParse(orderData['progres']) ?? 0;
+    if (orderData['progress'] != null) {
+      if (orderData['progress'] is int) {
+        progress = orderData['progress'];
+      } else if (orderData['progress'] is String) {
+        progress = int.tryParse(orderData['progress']) ?? 0;
       }
     }
 

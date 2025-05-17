@@ -499,6 +499,7 @@ String _generateRandomOrderNumber() {
                           "tailorId": order['tailorId'],
                           "userId": order['userId'],
                           "bookingId": order['id'],
+                          "progress" : order['progress']
                           },
                         ),
                       ),
@@ -529,6 +530,8 @@ String _generateRandomOrderNumber() {
                           builder: (context) => LeaveReview(
                             orderImage: order["imageUrl"] ?? "",
                             orderTitle: order["title"] ?? "",
+                            tailorId: order['tailorId'] ?? "",
+                            customerUid: FirebaseAuth.instance.currentUser?.uid ?? "",
                           ),
                         ),
                       );

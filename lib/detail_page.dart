@@ -438,7 +438,7 @@ String Idcustomer = FirebaseAuth.instance.currentUser?.uid ?? 'default_user_id';
       if (tailorDoc.exists) {
         setState(() {
           tailorName = tailorDoc['username']; 
-          // tailorProfileImage = tailorDoc['profileImage']; 7eta win tmchi l card
+          tailorProfileImage = tailorDoc['profileImage'] ?? '';
         });
       }
     } catch (e) {
@@ -525,15 +525,15 @@ String Idcustomer = FirebaseAuth.instance.currentUser?.uid ?? 'default_user_id';
                     child: Row(
                       children: [
                         tailorProfileImage.isNotEmpty
-                            ? CircleAvatar(
-                                backgroundImage: NetworkImage(tailorProfileImage),
-                                radius: 20,
-                              )
-                            : const CircleAvatar(
-                                backgroundImage: AssetImage("images/asset/5.jpg"),
-                                radius: 20,
-                              ),
-                        const SizedBox(width: 10),
+                              ? CircleAvatar(
+                                  backgroundImage: NetworkImage(tailorProfileImage),
+                                  radius: 20,
+                                )
+                              : const CircleAvatar(
+                                  backgroundImage: AssetImage("images/asset/5.jpg"),
+                                  radius: 20,
+                                ),
+                          const SizedBox(width: 10),
                         
                         Text(
                           tailorName.isNotEmpty ? tailorName : "Loading...",

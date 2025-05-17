@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_couture/login_screen.dart';
 import 'privacy_page.dart';
 import 'language_page.dart';
 import 'package:flutter_couture/screens/edit_profile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -56,27 +58,56 @@ class SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildListItem({
-    required IconData icon,
-    required String title,
-    required BuildContext context,
-    Widget? page,
-  }) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-      onTap: () {
-        if (page != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => page),
-          );
-        } else {
+  // Widget _buildListItem({
+  //   required IconData icon,
+  //   required String title,
+  //   required BuildContext context,
+  //   Widget? page,
+  // }) {
+  //   return ListTile(
+  //     leading: Icon(icon),
+  //     title: Text(title),
+  //     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+  //     onTap: () {
+  //       if (page != null) {
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => page),
+  //         );
+  //       } else {
           
+  //       }
+  //     },
+  //   );
+  // }
+
+  Widget _buildListItem({
+  required IconData icon,
+  required String title,
+  required BuildContext context,
+  Widget? page,
+}) {
+  return ListTile(
+    leading: Icon(icon),
+    title: Text(title),
+    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+    onTap: () async {
+      if (page != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => page),
+        );
+      } else {
+        if (title == "Logout") {
+          await FirebaseAuth.instance.signOut();
+          Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(builder: (context) => const LoginScreen()), 
+);
         }
-      },
-    );
-  }
+      }
+    },
+  );
+}
 }
 

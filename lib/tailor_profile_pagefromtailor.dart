@@ -174,6 +174,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:flutter_couture/following_list.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'screens/customer_list.dart';
@@ -193,13 +194,17 @@ class TailorProfilePage extends StatefulWidget {
 class TailorProfilePageState extends State<TailorProfilePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Model> userModels = [];
+  late String tailorId;
+  
 
 
   @override
   void initState() {
     super.initState();
+    tailorId = FirebaseAuth.instance.currentUser!.uid;
     _fetchUserModels(); 
-    setState(() {}); 
+    setState(() {});
+     
   }
 
   void _fetchUserModels() async {
@@ -216,12 +221,15 @@ class TailorProfilePageState extends State<TailorProfilePage> {
     });
   }
 
+  
+
 
 
   @override
   Widget build(BuildContext context) {
     
     final uid = FirebaseAuth.instance.currentUser?.uid;
+    
 
     return Scaffold(
       key: _scaffoldKey,
@@ -245,14 +253,14 @@ class TailorProfilePageState extends State<TailorProfilePage> {
                   alignment: Alignment.topCenter,
                   children: [
                     Container(
-                      height: 180,
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('images/asset/6.jpg'),
-                          fit: BoxFit.cover,
-                        ),
+                    height: 210,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: NetworkImage(data?['bannerImage'] ?? ''),
+                        fit: BoxFit.cover,
                       ),
                     ),
+                  ),
                     Positioned(
                       bottom: -40,
                       child: Container(
@@ -263,12 +271,21 @@ class TailorProfilePageState extends State<TailorProfilePage> {
                           color: Colors.white,
                           border: Border.all(color: Colors.white, width: 3),
                         ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'images/asset/2.jpg',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                        child:ClipOval(
+              child: data?['profileImage'] != null && data!['profileImage'].isNotEmpty
+                  ? Image.network(
+                      data['profileImage'],
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.person, size: 50, color: Colors.grey),
+                      ),
+                    )
+                  : Container(
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.person, size: 50, color: Colors.grey),
+                    ),
+),
                       ),
                     ),
                   ],
@@ -294,8 +311,9 @@ class TailorProfilePageState extends State<TailorProfilePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    
                     const SizedBox(width: 10),
-                    _buildTextButton(context, const CustomerList()),
+                    _buildTextButton(context, CustomerList(tailorId : tailorId)),
                     const SizedBox(width: 10),
                   ],
                 ),
@@ -326,6 +344,42 @@ class TailorProfilePageState extends State<TailorProfilePage> {
     );
   }
 
+  // Widget _buildPortfolioGrid(List<Model> models) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(8.0),
+  //     child: MasonryGridView.count(
+  //       shrinkWrap: true,
+  //       physics: const NeverScrollableScrollPhysics(),
+  //       crossAxisCount: 2,
+  //       mainAxisSpacing: 8,
+  //       crossAxisSpacing: 8,
+  //       itemCount: models.length,  
+  //       itemBuilder: (context, index) {
+  //         final model = models[index];
+  //         return ClipRRect(
+  //           borderRadius: BorderRadius.circular(10),
+  //           child: _buildPlaceholderImage(),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
+
+  // Widget _buildPlaceholderImage() {
+  //   return Container(
+  //     width: double.infinity,
+  //     height: 200, 
+  //     color: Colors.grey[300], 
+  //     child: Center(
+  //       child: Text(
+  //         'Image Unavailable', 
+  //         style: GoogleFonts.poppins(fontSize: 16, color: Colors.black),
+  //         textAlign: TextAlign.center,
+  //       ),
+  //     ),
+  //   );
+  // }
+
   Widget _buildPortfolioGrid(List<Model> models) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
@@ -335,56 +389,41 @@ class TailorProfilePageState extends State<TailorProfilePage> {
       crossAxisCount: 2,
       mainAxisSpacing: 8,
       crossAxisSpacing: 8,
-      itemCount: models.length,  
+      itemCount: models.length,
       itemBuilder: (context, index) {
         final model = models[index];
         return ClipRRect(
           borderRadius: BorderRadius.circular(10),
-          child: _buildModelImage(model.imageUrl),  // Use the model's image URL here
+          child: model.imageUrl != null && model.imageUrl!.isNotEmpty
+              ? Image.network(
+                  model.imageUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return _buildErrorImage(); // fallback if image fails to load
+                  },
+                )
+              : _buildErrorImage(),
         );
       },
     ),
   );
 }
 
-  Widget _buildModelImage(String? imageUrl) {
-  if (imageUrl == null || imageUrl.isEmpty) {
-    // fallback if image URL is null or empty
-    return Container(
-      width: double.infinity,
-      height: 200, 
-      color: Colors.grey[300], 
-      child: Center(
-        child: Text(
-          'Image Unavailable', 
-          style: GoogleFonts.poppins(fontSize: 16, color: Colors.black),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  return Image.network(
-    imageUrl,
+Widget _buildErrorImage() {
+  return Container(
     width: double.infinity,
     height: 200,
-    fit: BoxFit.cover,
-    errorBuilder: (context, error, stackTrace) {
-      return Container(
-        width: double.infinity,
-        height: 200,
-        color: Colors.grey[300],
-        child: Center(
-          child: Text(
-            'Image Unavailable',
-            style: GoogleFonts.poppins(fontSize: 16, color: Colors.black),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    },
+    color: Colors.grey[300],
+    child: Center(
+      child: Text(
+        'Image Unavailable',
+        style: GoogleFonts.poppins(fontSize: 16, color: Colors.black),
+        textAlign: TextAlign.center,
+      ),
+    ),
   );
 }
+
 
   Widget _buildTextButton(BuildContext context, Widget page) {
     return GestureDetector(
