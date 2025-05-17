@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_couture/home_page.dart';
+import 'package:flutter_couture/login_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'main_screen.dart';
@@ -38,7 +39,9 @@ void signUp(String email, String password, String username, String accountType) 
       'username': username,
       'accountType': accountType,
       'password' : password, 
-      'address' : ''
+      'address' : '',
+      'status': 'pending',
+      'createdAt': FieldValue.serverTimestamp(),
     });
     await FirebaseFirestore.instance.collection('customer').doc(uid).set({
       'id': uid,
@@ -46,13 +49,17 @@ void signUp(String email, String password, String username, String accountType) 
       'username': username,
       'accountType': accountType,
       'password' : password, 
-      'address' : ''
+      'address' : '',
+      'status': 'pending',
+      'createdAt': FieldValue.serverTimestamp(),
+      'following': [],
     });
     if (accountType == 'Customer') {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MainScreen()), 
+        MaterialPageRoute(builder: (context) => LoginScreen()), 
       );
+      // MainScreen
     }
     // Navigator.pushReplacement(
     //   context,

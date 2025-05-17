@@ -186,8 +186,9 @@
 //   }
 // }
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 class Booking {
   final String id;
   final String categoryId;
@@ -202,6 +203,7 @@ class Booking {
   final DateTime createdAt;
   final String note;
   final int progress;
+  final String? imageUrl;
 
   Booking({
     required this.id,
@@ -217,77 +219,8 @@ class Booking {
     required this.createdAt,
     required this.note,
     required this.progress,
+    this.imageUrl,
   });
-
-  // factory Booking.fromFirestore(DocumentSnapshot doc) {
-  //   final data = doc.data() as Map<String, dynamic>;
-  //   return Booking(
-  //     id: doc.id,  
-  //     categoryId: data['categoryId'] ?? '',  
-  //     userId: data['userId'] ?? '',  
-  //     tailorId: data['tailorId'] ?? '',  
-  //     modelId: data['modelId'] ?? '', 
-  //     initialprice: data['initialprice'] ?? '',  
-  //     modifiedprice: data['modifiedprice'] ?? '', 
-  //     colors: (data['colors'] is List) ? List<String>.from(data['colors']) : [],
-  //     sizes: (data['sizes'] is List) ? List<String>.from(data['sizes']) : [],
-  //     status: data['status'] ?? '', 
-  //     createdAt: data['createdAt'] != null && data['createdAt'] is Timestamp
-  //         ? (data['createdAt'] as Timestamp).toDate() 
-  //         : DateTime.now(), 
-  //     note: data['note'] ?? '',  
-  //   );
-  // }
-
-//   factory Booking.fromFirestore(DocumentSnapshot doc) {
-//   final data = doc.data() as Map<String, dynamic>;
-//   return Booking(
-//     id: doc.id,
-//     categoryId: data['categoryId'] ?? '',
-//     userId: data['userId'] ?? '',
-//     tailorId: data['tailorId'] ?? '',
-//     modelId: data['modelId'] ?? '',
-//     initialprice: data['initialprice'] ?? '',
-//     modifiedprice: data['modifiedprice'] ?? '',
-//     colors: (data['colors'] is List) ? List<String>.from(data['colors']) : [], // Defensive check for list
-//     sizes: (data['sizes'] is List) ? List<String>.from(data['sizes']) : [],   // Defensive check for list
-//     status: data['status'] ?? '',
-//     createdAt: (data['createdAt'] != null && data['createdAt'] is Timestamp)
-//         ? (data['createdAt'] as Timestamp).toDate()
-//         : DateTime.now(),
-//     note: data['note'] ?? '',
-//   );
-// }
-
-
-
-
-// factory Booking.fromFirestore(DocumentSnapshot doc) {
-//   final data = doc.data() as Map<String, dynamic>?;
-
-//   if (data == null) {
-//     throw Exception("Booking data is null");
-//   }
-
-//   return Booking(
-//     id: doc.id,
-//     categoryId: data['categoryId'] ?? '',
-//     userId: data['userId'] ?? '',
-//     tailorId: data['tailorId'] ?? '',
-//     modelId: data['modelId'] ?? '',
-//     initialprice: data['initialprice'] ?? '',
-//     modifiedprice: data['modifiedprice'] ?? '',
-//     // colors: (data['colors'] is List) ? List<String>.from(data['colors']) : <String>[],
-//     // sizes: (data['sizes'] is List) ? List<String>.from(data['sizes']) : <String>[],
-//     colors: data['colors'] is List ? List<String>.from(data['colors'].map((e) => e.toString())): [],
-//     sizes: data['sizes'] is List ? List<String>.from(data['sizes'].map((e) => e.toString())): [],
-//     status: data['status'] ?? '',
-//     createdAt: (data['createdAt'] is Timestamp)
-//         ? (data['createdAt'] as Timestamp).toDate()
-//         : DateTime.now(),
-//     note: data['note'] ?? '',
-//   );
-// }
 
 
 factory Booking.fromFirestore(DocumentSnapshot doc) {
@@ -320,6 +253,7 @@ factory Booking.fromFirestore(DocumentSnapshot doc) {
     progress: data['progress'] is int
         ? data['progress'] as int
         : int.tryParse(data['progress']?.toString() ?? '') ?? 0,
+    imageUrl: data['imageUrl']
   );
 }
 }

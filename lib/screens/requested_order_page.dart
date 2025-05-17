@@ -5,12 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 class RequestedOrderPage extends StatefulWidget {
   final String title;
   final String price;
-  // final String image;
+  final String? imageUrl;
   final String color;
   final String size;
   final String notes;
   final String bookingId;
   final int progress;
+
 
   const RequestedOrderPage({
     required this.bookingId,
@@ -22,6 +23,7 @@ class RequestedOrderPage extends StatefulWidget {
     required this.size,
     required this.notes,
     required this.progress,
+    this.imageUrl,
   });
 
   @override
@@ -33,36 +35,119 @@ class _RequestedOrderPageState extends State<RequestedOrderPage> {
   final FocusNode _priceFocusNode = FocusNode();
   bool _isPriceChanged = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _priceController.text = widget.price;
+   String? _fetchedImageUrl; 
 
-    _priceFocusNode.addListener(() {
-      setState(() {});
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _priceController.text = widget.price;
+
+  //   _priceFocusNode.addListener(() {
+  //     setState(() {});
+  //   });
+  // }
+
+  
+
+
+@override
+void initState() {
+  super.initState();
+  print('initState called');
+  _priceController.text = widget.price;
+  _priceFocusNode.addListener(() {
+    setState(() {});
+  });
+
+
+String buildCloudinaryUrl(String publicId) {
+  const cloudName = 'dyxrwqehs'; 
+  return 'https://res.cloudinary.com/$cloudName/image/upload/$publicId.jpg';
+}
+
+
+@override
+void initState() {
+  super.initState();
+  print('initState called');
+  _priceController.text = widget.price;
+  _priceFocusNode.addListener(() {
+    setState(() {});
+  });
+
+  print("Fetching imageUrl for bookingId: ${widget.bookingId}");
+  FirebaseFirestore.instance
+      .collection('bookings')
+      .doc(widget.bookingId)
+      .get()
+      .then((doc) {
+        print("Firestore doc fetched");
+        if (doc.exists) {
+          final data = doc.data();
+          print("Full booking data: $data");
+          final cloudinaryPath = data?['imageUrl'];
+          print("Fetched imageUrl from Firestore: '$cloudinaryPath'");
+
+          setState(() {
+            _fetchedImageUrl = (cloudinaryPath != null && cloudinaryPath.isNotEmpty)
+                ? cloudinaryPath
+                : widget.imageUrl;
+            print("Using image URL: $_fetchedImageUrl");
+          });
+        } else {
+          print("Document does not exist.");
+          setState(() {
+            _fetchedImageUrl = widget.imageUrl;
+          });
+        }
+      }).catchError((error) {
+        print("Error fetching booking imageUrl: $error");
+        setState(() {
+          _fetchedImageUrl = widget.imageUrl;
+        });
+      });
+}
+
+FirebaseFirestore.instance
+  .collection('bookings')
+  .doc(widget.bookingId)
+  .get()
+  .then((doc) {
+    if (doc.exists) {
+      final data = doc.data();
+      print("Full booking data: $data");
+      final cloudinaryPath = data?['imageUrl'];
+      print("Fetched imageUrl from Firestore: '$cloudinaryPath'");
+      
+      setState(() {
+        _fetchedImageUrl = (cloudinaryPath != null && cloudinaryPath.isNotEmpty)
+          ? cloudinaryPath
+          : widget.imageUrl;
+        print("Using image URL: $_fetchedImageUrl");
+      });
+    } else {
+      print("Document does not exist.");
+      setState(() {
+        _fetchedImageUrl = widget.imageUrl;
+      });
+    }
+  }).catchError((error) {
+    print("Error fetching booking imageUrl: $error");
+    setState(() {
+      _fetchedImageUrl = widget.imageUrl;
     });
-  }
+  });
+  
 
-  @override
-  void dispose() {
-    _priceController.dispose();
-    _priceFocusNode.dispose();
-    super.dispose();
-  }
 
-//   Future<void> updateBookingStatus(String bookingId, String status , {String? price}) async {
-//   try {
+// @override
+//   void dispose() {
+//     _priceController.dispose();
+//     _priceFocusNode.dispose();
+//     super.dispose();
+//   } 
 
-//     final bookingRef = FirebaseFirestore.instance.collection('bookings').doc(bookingId);
-//     await bookingRef.update({
-//       'status': status.toLowerCase(),
-//     });
-    
-//     print('Booking status updated to: $status');
-//   } catch (e) {
-//     print('Error updating booking status: $e');
-//   }
-// }
+}
 
 Future<void> updateBookingStatus(String bookingId, String status, {String? price}) async {
   try {
@@ -75,6 +160,7 @@ Future<void> updateBookingStatus(String bookingId, String status, {String? price
     }
     await bookingRef.update(updates);
     print('Booking status and/or price updated.');
+    
   } catch (e) {
     print('Error updating booking: $e');
   }
@@ -97,15 +183,32 @@ Future<void> updateBookingStatus(String bookingId, String status, {String? price
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ClipRRect(
-            //   borderRadius: BorderRadius.circular(10),
-            //   child: Image.asset(
-            //     widget.image,
-            //     width: double.infinity,
-            //     height: 200,
-            //     fit: BoxFit.cover,
-            //   ),
-            // ),
+          ClipRRect(
+  borderRadius: BorderRadius.circular(10),
+  child: (_fetchedImageUrl != null && _fetchedImageUrl!.isNotEmpty)
+      ? Image.network(
+          _fetchedImageUrl!,
+          width: double.infinity,
+          height: 200,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: double.infinity,
+              height: 200,
+              color: Colors.grey[300],
+              alignment: Alignment.center,
+              child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+            );
+          },
+        )
+      : Container(
+          width: double.infinity,
+          height: 200,
+          color: Colors.grey[300],
+          alignment: Alignment.center,
+          child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+        ),
+),
             const SizedBox(height: 20),
             Text(
               widget.title,

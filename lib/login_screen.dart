@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_couture/forgotpassword.dart';
-import 'package:flutter_couture/tailorhomepage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -26,47 +25,121 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
+  // void signIn() async {
+  //   try {
+  //      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+  //       email: _emailController.text.trim(),
+  //       password: _passwordController.text.trim(),
+  //     );
+
+  //   String uid = userCredential.user!.uid;
+
+  //   DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+  //   if (userDoc.exists) {
+  //     String accountType = userDoc.get('accountType');
+
+  //     if (accountType == 'Customer') {
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => MainScreen() ),
+  //       );
+  //     } else if (accountType == 'Tailor') {
+  //       Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => MainScreentailor()),
+  //     );
+  //     }
+  //   }
+  //   } on FirebaseAuthException catch (e) {
+  //     String errorMessage = "An error occurred";
+
+  //     if (e.code == 'user-not-found') {
+  //       errorMessage = "Pas d'utilisateur avec ces cordonnees ";
+  //     }
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text(errorMessage)),
+  //     );
+  //   }
+  // }
+
   void signIn() async {
-    try {
-       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+  try {
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
 
     String uid = userCredential.user!.uid;
 
     DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
     if (userDoc.exists) {
       String accountType = userDoc.get('accountType');
+      String userStatus = userDoc.get('status');  
 
-      if (accountType == 'Customer') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MainScreen() ),
+      if (userStatus == 'pending') {
+      
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Account Status"),
+              content: Text("Please wait for the admin's decision to accept your signup request."),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            );
+          },
         );
-      } else if (accountType == 'Tailor') {
-        Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MainScreentailor()),
-      );
+      } else if (userStatus == 'approved') {
+        if (accountType == 'Customer') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MainScreen()),
+          );
+        } else if (accountType == 'Tailor') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MainScreentailor()),
+          );
+        }
+      } else if (userStatus == 'rejected') {
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Your signup request has been rejected.")),
+        );
+      } else {
+        // Show unknown status message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Unknown user status.")),
+        );
       }
-    }
-    } on FirebaseAuthException catch (e) {
-      String errorMessage = "An error occurred";
-
-      if (e.code == 'user-not-found') {
-        errorMessage = "Pas d'utilisateur avec ces cordonnees ";
-      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
+        SnackBar(content: Text("User not found")),
       );
     }
+  } on FirebaseAuthException catch (e) {
+    String errorMessage = "An error occurred";
+
+    if (e.code == 'user-not-found') {
+      errorMessage = "Pas d'utilisateur avec ces coordonnées ";
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(errorMessage)),
+    );
   }
+}
+
 
   Future<void> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return; // User canceled sign-in
+      if (googleUser == null) return; 
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
@@ -81,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Homepagetailor()), // il faut chnager le path selon le custom !!!!
+        MaterialPageRoute(builder: (context) => MainScreentailor()),  // to make sure cets valide !
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -90,7 +163,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // Navigate to Sign Up Screen
   void openSignupScreen() {
     Navigator.of(context).pushReplacementNamed('accountTypeScreen');
   }

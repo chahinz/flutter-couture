@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_couture/tailorhomepage.dart';
 import 'package:flutter_couture/tailor_profile_creation_screen.dart'; 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -23,6 +22,8 @@ class _TailorSignUpScreenState extends State<TailorSignUpScreen> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   String? _passwordError;
 
+
+
   void signUp(String email, String password, String username,
       String accountType) async {
     try {
@@ -31,8 +32,6 @@ class _TailorSignUpScreenState extends State<TailorSignUpScreen> {
         email: email,
         password: password,
       );
-
-
       String uid = userCredential.user!.uid;
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
         'id': uid, 
@@ -40,6 +39,7 @@ class _TailorSignUpScreenState extends State<TailorSignUpScreen> {
         'username': username,
         'accountType': accountType,
         'password': password,
+        'status': 'pending',
       });
        await FirebaseFirestore.instance.collection('tailors').doc(uid).set({
         'id': uid, 
@@ -47,8 +47,9 @@ class _TailorSignUpScreenState extends State<TailorSignUpScreen> {
         'username': username,
         'accountType': accountType,
         'password': password,
+        'status': 'pending',
+        'followers': [],
       });
-      // Changed navigation target here
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => TailorProfileCreationScreen()),
@@ -107,7 +108,7 @@ class _TailorSignUpScreenState extends State<TailorSignUpScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Homepagetailor()),
+        MaterialPageRoute(builder: (context) => TailorProfileCreationScreen()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

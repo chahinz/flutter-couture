@@ -1213,7 +1213,6 @@ class _OrdersListState extends State<OrdersList> {
     }
   }
 
-
 Future<List<Map<String, dynamic>>> fetchBookingsWithModelData(
     String tailorId, String statusFilter) async {
   final querySnapshot = await FirebaseFirestore.instance
@@ -1256,11 +1255,14 @@ Future<List<Map<String, dynamic>>> fetchBookingsWithModelData(
 
       final model = Model.fromJson(modelData);
 
+      final String imageUrl = modelData['imageUrl'] ?? '';
+
       orders.add({
         'booking': booking,
         'model': model,
         'modelColors': modelColors,
         'modelSizes': modelSizes,
+        'imageUrl': imageUrl,
       });
 
       print('✅ Model found: ${model.name}');
@@ -1300,72 +1302,105 @@ Future<List<Map<String, dynamic>>> fetchBookingsWithModelData(
             final booking = orders[index]['booking'] as Booking;
             final model = orders[index]['model'] as Model;
 
-            return ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 15,
+return ListTile(
+  contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+  leading: orders[index]['imageUrl'] != ''
+      ? Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
               ),
-              title: Text(
-                model.name,
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              subtitle: Text(
-                "${booking.modifiedprice} DA",
-                style: GoogleFonts.poppins(
-                  color: Colors.grey,
-                  fontSize: 16,
-                ),
-              ),
-              trailing: (widget.orderType == "Update" ||
-                      widget.orderType == "view Request")
-                  ? ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            const Color.fromARGB(255, 163, 119, 178),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                      ),
-                      onPressed: () {
-                        final destination = widget.orderType == "Update"
-                            ? UpdateOrderPage(
-                                bookingId: booking.id,
-                                title: model.name,
-                                price: booking.modifiedprice,
-                                color: booking.colors?.join(', ') ?? '',
-                                size: booking.sizes?.join(', ') ?? '',
-                                notes: booking.note,
-                                progress : 0,
-                              )
-                            : RequestedOrderPage(
-                                bookingId: booking.id,
-                                title: model.name,
-                                price: booking.initialprice,
-                                color: booking.colors?.join(', ') ?? '',
-                                size: booking.sizes?.join(', ') ?? '',
-                                notes: booking.note,
-                                progress : 0,
-                              );
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              orders[index]['imageUrl'],
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 60),
+            ),
+          ),
+        )
+      : const Icon(Icons.image_not_supported, size: 60, color: Colors.grey),
+  
+  title: Text(
+    model.name,
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+    style: GoogleFonts.poppins(
+      fontWeight: FontWeight.w600,
+      fontSize: 18,
+    ),
+  ),
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => destination),
-                        );
-                      },
-                      child: Text(
-                        widget.orderType,
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    )
-                  : null,
+  subtitle: Padding(
+    padding: const EdgeInsets.only(top: 4),
+    child: Text(
+      "${booking.modifiedprice} DA",
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: GoogleFonts.poppins(
+        color: Colors.grey[600],
+        fontSize: 15,
+      ),
+    ),
+  ),
+
+  trailing: (widget.orderType == "Update" || widget.orderType == "view Request")
+      ? ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color.fromARGB(255, 163, 119, 178),
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            elevation: 3,
+          ),
+          onPressed: () {
+            final destination = widget.orderType == "Update"
+                ? UpdateOrderPage(
+                    bookingId: booking.id,
+                    title: model.name,
+                    price: booking.modifiedprice,
+                    color: booking.colors?.join(', ') ?? '',
+                    size: booking.sizes?.join(', ') ?? '',
+                    notes: booking.note,
+                    progress: 0,
+                    imageUrl: orders[index]['imageUrl'],
+                  )
+                : RequestedOrderPage(
+                    bookingId: booking.id,
+                    title: model.name,
+                    price: booking.initialprice,
+                    color: booking.colors?.join(', ') ?? '',
+                    size: booking.sizes?.join(', ') ?? '',
+                    notes: booking.note,
+                    progress: 0,
+                    imageUrl: orders[index]['imageUrl'],
+                  );
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => destination),
             );
+          },
+          child: Text(
+            widget.orderType,
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        )
+      : null,
+);
           },
         );
       },

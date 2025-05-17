@@ -1,21 +1,83 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class TailorProfilePage extends StatefulWidget {
   final String name;
   final String image;
+  final String tailorId;
 
-  const TailorProfilePage({super.key, required this.name, required this.image});
+  const TailorProfilePage({super.key, required this.name, required this.image , required this.tailorId});
 
   @override
   State<TailorProfilePage> createState() => _TailorProfilePageState();
 }
 
+
 class _TailorProfilePageState extends State<TailorProfilePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool isFollowing = false; // Follow button state
-  final Set<String> _likedImages = {}; // Liked images set
+  bool isFollowing = false; 
+  final Set<String> _likedImages = {}; 
+
+
+String tailorName = "";
+String profileImage = "";
+String bio = "";
+String phone = "";
+String bannerImage = "";
+String wilaya = "";
+String type = "";
+List<String> categories = [];
+List<String> portfolioImages = [];
+List<String> followers = [];
+
+  bool _isLoading = true;
+
+
+final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
+
+
+@override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    fetchTailorData();
+  }
+
+Future<void> fetchTailorData() async {
+  final doc = await FirebaseFirestore.instance.collection('tailors').doc(widget.tailorId).get();
+
+  final postsSnapshot = await FirebaseFirestore.instance
+      .collection('tailors')
+      .doc(widget.tailorId)
+      .collection('models')
+      .get();
+
+      final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+
+  setState(() {
+    tailorName = doc['username'];
+    profileImage = doc['profileImage'] ?? ''; 
+    bio = doc['bio'];
+    bannerImage = doc['bannerImage'] ?? ''; 
+    phone = doc['phoneNumber'];
+    wilaya = doc['wilaya'];
+    type = doc['businessType'];
+    categories = List<String>.from(doc['categories']);
+    followers = doc.data() != null && doc.data()!.containsKey('followers')
+    ? List<String>.from(doc['followers'])
+    : [];
+    isFollowing = currentUserId != null && followers.contains(currentUserId);
+    portfolioImages = postsSnapshot.docs.map((d) => d['imageUrl'] as String).toList();
+
+  });
+}
+
+
 
   final List<String> allImages = [
     'images/1.jpg',
@@ -42,11 +104,6 @@ class _TailorProfilePageState extends State<TailorProfilePage>
     {"name": "Ahmed K.", "rating": 3, "comment": "Good, but could be better."},
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
 
   @override
   void dispose() {
@@ -107,7 +164,7 @@ class _TailorProfilePageState extends State<TailorProfilePage>
               style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 5),
           Text(
-            "Skilled tailor creating custom clothing with a perfect fit and unique style.",
+            bio,
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
           ),
@@ -151,7 +208,25 @@ class _TailorProfilePageState extends State<TailorProfilePage>
 
   Widget _buildFollowButton() {
     return GestureDetector(
-      onTap: () {
+      
+      onTap: () async {
+        final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+        final customerRef = FirebaseFirestore.instance.collection('customer').doc(currentUserId);
+        if (!isFollowing) {
+          await FirebaseFirestore.instance.collection('tailors').doc(widget.tailorId).update({
+            'followers': FieldValue.arrayUnion([currentUserId]),
+          });
+          await customerRef.update({
+            'following': FieldValue.arrayUnion([widget.tailorId]),
+          });
+        } else {
+          await FirebaseFirestore.instance.collection('tailors').doc(widget.tailorId).update({
+            'followers': FieldValue.arrayRemove([currentUserId]),
+          });
+           await customerRef.update({
+            'following': FieldValue.arrayRemove([widget.tailorId]),
+          });
+        }
         setState(() {
           isFollowing = !isFollowing;
         });
@@ -247,25 +322,42 @@ class _TailorProfilePageState extends State<TailorProfilePage>
       },
     );
   }
-   Widget _buildAboutTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-            const SizedBox(height: 10),
-          _buildInfoRow(Icons.phone, "Phone: +213 555 123 456"),
-            const SizedBox(height: 20),
-          _buildInfoRow(Icons.location_on, "Wilaya: Algiers, Algeria"),
-            const SizedBox(height: 20),
-          _buildInfoRow(Icons.work, "Type: Independent"),
-            const SizedBox(height: 20),
-          _buildInfoRow(Icons.grid_view,
-              "Categories: Traditional, Modern"),
-        ],
+
+
+Widget _buildAboutTab() {
+  return Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 10),
+        _buildInfoRow(Icons.phone, phone),
+        const SizedBox(height: 20),
+        _buildInfoRow(Icons.location_on, wilaya),
+        const SizedBox(height: 20),
+        _buildInfoRow(Icons.work, type),
+        const SizedBox(height: 20),
+        
+        
+        Row(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Icon(Icons.grid_view, color: Color.fromARGB(255, 163, 119, 178)),
+    const SizedBox(width: 10),
+    Expanded(
+      child: Text(
+        categories.isNotEmpty ? categories.join(", ") : "No categories",
+        style: GoogleFonts.poppins(fontSize: 14),
+        softWrap: true,
       ),
-    );
-  }
+    ),
+  ],
+),
+
+      ],
+    ),
+  );
+}
 
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
@@ -277,3 +369,4 @@ class _TailorProfilePageState extends State<TailorProfilePage>
     );
   }
 }
+

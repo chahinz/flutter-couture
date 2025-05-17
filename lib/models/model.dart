@@ -10,7 +10,8 @@ class Model {
   List<String>? sizes;
   String subcategoryId;
   String idcategory;
-
+  String? imageUrl;
+  
   Model({
     required this.colors,
     required this.description,
@@ -23,6 +24,7 @@ class Model {
     required this.sizes,
     required this.subcategoryId,
     required this.idcategory,
+    this.imageUrl,
   });
 
 
@@ -39,27 +41,9 @@ class Model {
       'sizes': sizes,
       'subcategoryId': subcategoryId,
       'idcategory':idcategory,
+      'imageUrl': imageUrl ?? '',
     };
   }
-
-
-//   factory Model.fromMap(Map<String, dynamic> map) {
-//   print('Model data: $map');  // Debug log for inspecting the incoming data
-
-//   return Model(
-// colors: (map['colors'] as List?)?.map((e) => e.toString()).toList() ?? [],
-// sizes: (map['sizes'] as List?)?.map((e) => e.toString()).toList() ?? [],
-//     description: map['description'] ?? '',
-//     fabrics: map['fabrics'] != null ? List<String>.from(map['fabrics']) : [],
-//     modelId: map['idModel'] ?? '',
-//     idTailor: map['idTailor'] ?? '',
-//     name: map['name'] ?? '',
-//     notes: map['notes'] ?? '',
-//     price: map['price'] ?? '',
-//     subcategoryId: map['subcategoryId'] ?? '',
-//     idcategory: map['idcategory'] ?? '',
-//   );
-// }
 
 
 factory Model.fromJson(Map<String, dynamic> json) {
@@ -75,6 +59,7 @@ factory Model.fromJson(Map<String, dynamic> json) {
       sizes: json['sizes'] is List ? List<String>.from(json['sizes']) : <String>[],
       fabrics: json['fabrics'] is List ? List<String>.from(json['fabrics']) : <String>[],
       notes: json['notes'] ?? '',
+      imageUrl: json['imageUrl'] ?? '',
     );
   }
 

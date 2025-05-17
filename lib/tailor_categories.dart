@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_couture/login_screen.dart';
 import 'package:flutter_couture/main_screentailor.dart';
 import 'package:google_fonts/google_fonts.dart';
 import "package:firebase_auth/firebase_auth.dart";
@@ -56,8 +57,9 @@ class _TailorCategoriesScreenState extends State<TailorCategoriesScreen> {
       );
        Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MainScreentailor()),
+          MaterialPageRoute(builder: (context) => LoginScreen()),
         );
+        //MainScreentailor
     } catch(e) {
        print("Error updating categories: $e");
         ScaffoldMessenger.of(context).showSnackBar(

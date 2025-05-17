@@ -179,8 +179,6 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'screens/customer_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_couture/models/post_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'models/model.dart';
 
 String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
@@ -302,58 +300,12 @@ class TailorProfilePageState extends State<TailorProfilePage> {
                   ],
                 ),
                 const Divider(),
-//                 _buildPortfolioGrid(),
-//               ],
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
 
-//   Widget _buildPortfolioGrid() {
-//     return Padding(
-//       padding: const EdgeInsets.all(8.0),
-//       child: MasonryGridView.count(
-//         shrinkWrap: true,
-//         physics: const NeverScrollableScrollPhysics(),
-//         crossAxisCount: 2,
-//         mainAxisSpacing: 8,
-//         crossAxisSpacing: 8,
-
-//       itemCount: userModels.length,  
-//       itemBuilder: (context, index) {
-//         final model = userModels[index];
-//         return ClipRRect(
-//           borderRadius: BorderRadius.circular(10),
-//           child: _buildPlaceholderImage(),
-//         );
-//       },
-//     ),
-//   );
-// }
-
-// Widget _buildPlaceholderImage() {
-//   return Container(
-//     width: double.infinity,
-//     height: 200, 
-//     color: Colors.grey[300], 
-//     child: Center(
-//       child: Text(
-//         'Image Unavailable', 
-//         style: GoogleFonts.poppins(fontSize: 16, color: Colors.black),
-//         textAlign: TextAlign.center,
-//       ),
-//     ),
-//   );
-// }
-
-
- StreamBuilder<QuerySnapshot>(
+                  StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('models') 
                       .where('idTailor', isEqualTo: uid)
-                      .snapshots(), // Listen to changes
+                      .snapshots(),
                   builder: (context, modelSnapshot) {
                     if (!modelSnapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());
@@ -375,27 +327,29 @@ class TailorProfilePageState extends State<TailorProfilePage> {
   }
 
   Widget _buildPortfolioGrid(List<Model> models) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: MasonryGridView.count(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        itemCount: models.length,  
-        itemBuilder: (context, index) {
-          final model = models[index];
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: _buildPlaceholderImage(),
-          );
-        },
-      ),
-    );
-  }
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: MasonryGridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      mainAxisSpacing: 8,
+      crossAxisSpacing: 8,
+      itemCount: models.length,  
+      itemBuilder: (context, index) {
+        final model = models[index];
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: _buildModelImage(model.imageUrl),  // Use the model's image URL here
+        );
+      },
+    ),
+  );
+}
 
-  Widget _buildPlaceholderImage() {
+  Widget _buildModelImage(String? imageUrl) {
+  if (imageUrl == null || imageUrl.isEmpty) {
+    // fallback if image URL is null or empty
     return Container(
       width: double.infinity,
       height: 200, 
@@ -410,6 +364,27 @@ class TailorProfilePageState extends State<TailorProfilePage> {
     );
   }
 
+  return Image.network(
+    imageUrl,
+    width: double.infinity,
+    height: 200,
+    fit: BoxFit.cover,
+    errorBuilder: (context, error, stackTrace) {
+      return Container(
+        width: double.infinity,
+        height: 200,
+        color: Colors.grey[300],
+        child: Center(
+          child: Text(
+            'Image Unavailable',
+            style: GoogleFonts.poppins(fontSize: 16, color: Colors.black),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    },
+  );
+}
 
   Widget _buildTextButton(BuildContext context, Widget page) {
     return GestureDetector(

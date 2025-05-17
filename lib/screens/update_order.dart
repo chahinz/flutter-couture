@@ -628,6 +628,7 @@ class UpdateOrderPage extends StatefulWidget {
   final String size;
   final String notes;
   final int progress;
+  final String? imageUrl;
 
   const UpdateOrderPage({
     super.key,
@@ -638,6 +639,7 @@ class UpdateOrderPage extends StatefulWidget {
     required this.size,
     required this.notes,
     required this.progress,
+    this.imageUrl,
   });
 
   @override
@@ -707,6 +709,7 @@ class _UpdateOrderPageState extends State<UpdateOrderPage> {
       );
     }
 
+
     return Scaffold(
       appBar: AppBar(title: const Text("Update Order")),
       body: SingleChildScrollView(
@@ -714,6 +717,43 @@ class _UpdateOrderPageState extends State<UpdateOrderPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (widget.imageUrl != null && widget.imageUrl!.isNotEmpty)
+  Center(
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.network(
+        widget.imageUrl!,
+        width: 300,
+        height: 300,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return const Icon(Icons.broken_image, size: 80, color: Colors.grey);
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const SizedBox(
+            width: 80,
+            height: 80,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        },
+      ),
+    ),
+  )
+else
+  Center(
+    child: Container(
+      width: 200,
+      height: 200,
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Icon(Icons.image, size: 80, color: Colors.white70),
+    ),
+  ),
+
+const SizedBox(height: 20),
             const SizedBox(height: 20),
             Text(
               widget.title,

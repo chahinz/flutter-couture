@@ -5,8 +5,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter_couture/models/post_model.dart';
 import 'package:flutter_couture/models/model.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 
 
@@ -114,6 +117,32 @@ List<Map<String, dynamic>> subcategories = [];
       });
     }
   }
+
+  Future<File> uint8ListToFile(Uint8List bytes) async {
+  final tempDir = await getTemporaryDirectory();
+  final file = File('${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg');
+  await file.writeAsBytes(bytes);
+  return file;
+}
+
+Future<String?> uploadImageToCloudinary(File file) async {
+  
+  final cloudinaryUrl = 'https://api.cloudinary.com/v1_1/dyxrwqehs/image/upload';
+  var request = http.MultipartRequest('POST', Uri.parse(cloudinaryUrl));
+  request.fields['upload_preset'] = 'flutter_unsigned';
+
+  request.files.add(await http.MultipartFile.fromPath('file', file.path));
+  var response = await request.send();
+  if (response.statusCode == 200) {
+    var respStr = await response.stream.bytesToString();
+    var jsonResponse = jsonDecode(respStr);
+    return jsonResponse['secure_url'];
+  } else {
+    print('Upload failed: ${response.statusCode}');
+    return null;
+  }
+}
+
 
 //   Future<void> savePost(Post post) async {
 //   final postJson = post.toJson();
@@ -443,14 +472,110 @@ const SizedBox(height: 20),
 // },
 
 
+
+
+
+
+
+
+// onPressed: () async {
+//   try {
+
+//     if (_imageBytes != null) {
+//   File imageFile = await uint8ListToFile(_imageBytes!); 
+//   String? imageUrl = await uploadImageToCloudinary(imageFile);
+
+//   if (imageUrl != null) {
+//     print('Image uploaded: $imageUrl');
+//   } else {
+//     print('Upload failed');
+//   }
+// } 
+
+//     final user = FirebaseAuth.instance.currentUser;
+
+//     if (user == null) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text("User not logged in!", style: GoogleFonts.poppins())),
+//       );
+//       return;
+//     }
+
+//     if (selectedCategory == null || selectedSubcategory == null) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text("Please select a category and subcategory.", style: GoogleFonts.poppins())),
+//       );
+//       return;
+//     }
+
+//     // String imageUrl = await uploadImage(_imageBytes!);
+
+//      final modelDoc = FirebaseFirestore.instance.collection('models').doc();
+//     String generatedId = modelDoc.id;
+
+    
+//     Model newModel = Model(
+
+//       colors: selectedColors
+//           .map((c) => '#${c.value.toRadixString(16).padLeft(8, '0')}')
+//           .toList(),
+
+//       description: detailsController.text.trim(),
+//       fabrics: selectedFabrics,
+//       modelId: generatedId,  
+//       idTailor: user.uid,  
+//       name: titleController.text.trim(),
+//       notes: detailsController.text.trim(),  
+//       price:  priceController.text,
+//       sizes: selectedSizes,
+//       subcategoryId: selectedSubcategory ?? '',
+//       idcategory: selectedCategory ?? '', 
+//       imageUrl: imageUrl,
+    
+      
+//     );
+
+//     print('Model Data: ${newModel.toMap()}');
+//      print("Post saved with image URL: $imageUrl");
+
+//     await modelDoc.set(newModel.toMap());
+
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text("Model uploaded!", style: GoogleFonts.poppins())),
+//     );
+
+//     setState(() {
+//       _imageBytes = null;
+//       titleController.clear();
+//       detailsController.clear();
+//       fabricController.clear();
+//       selectedSizes.clear();
+//       priceController.clear();
+//       selectedColors.clear();
+//       selectedFabrics.clear();
+//     });
+//   } catch (e) {
+//     print("🔥 Error saving model: $e");
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text("Error: $e", style: GoogleFonts.poppins())),
+//     );
+//   }
+// },
+
 onPressed: () async {
   try {
-    // if (_imageBytes == null) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text("Please select an image.", style: GoogleFonts.poppins())),
-    //   );
-    //   return;
-    // }
+    String? imageUrl; 
+
+    if (_imageBytes != null) {
+      File imageFile = await uint8ListToFile(_imageBytes!);
+      imageUrl = await uploadImageToCloudinary(imageFile); 
+
+      if (imageUrl != null) {
+        print('Image uploaded: $imageUrl');
+      } else {
+        print('Upload failed');
+      }
+    }
 
     final user = FirebaseAuth.instance.currentUser;
 
@@ -468,36 +593,28 @@ onPressed: () async {
       return;
     }
 
-    // String imageUrl = await uploadImage(_imageBytes!);
-
-     final modelDoc = FirebaseFirestore.instance.collection('models').doc();
+    final modelDoc = FirebaseFirestore.instance.collection('models').doc();
     String generatedId = modelDoc.id;
 
-    
     Model newModel = Model(
-
       colors: selectedColors
           .map((c) => '#${c.value.toRadixString(16).padLeft(8, '0')}')
           .toList(),
-
       description: detailsController.text.trim(),
       fabrics: selectedFabrics,
-      modelId: generatedId,  
-      idTailor: user.uid,  
+      modelId: generatedId,
+      idTailor: user.uid,
       name: titleController.text.trim(),
-      notes: detailsController.text.trim(),  
-      price:  priceController.text,
+      notes: detailsController.text.trim(),
+      price: priceController.text,
       sizes: selectedSizes,
       subcategoryId: selectedSubcategory ?? '',
-      idcategory: selectedCategory ?? '', 
-      
-       // Default or dynamically selected subcategory
-      
+      idcategory: selectedCategory ?? '',
+      imageUrl: imageUrl,  
     );
 
     print('Model Data: ${newModel.toMap()}');
 
-    // await saveModel(newModel);
     await modelDoc.set(newModel.toMap());
 
     ScaffoldMessenger.of(context).showSnackBar(

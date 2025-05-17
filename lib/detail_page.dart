@@ -318,6 +318,7 @@ class DetailPage extends StatefulWidget {
   final List<String> availableColors;
   final List<String> availableSizes;
   final int progress; 
+  final String? imageUrl; 
 
   const DetailPage({
     Key? key,
@@ -330,6 +331,7 @@ class DetailPage extends StatefulWidget {
     required this.fabricType,
     this.availableColors = const [], 
     this.availableSizes = const [],  
+    this.imageUrl ,
   }) : super(key: key);
 
   @override
@@ -339,6 +341,7 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   String tailorName = "";
   String tailorProfileImage = ""; 
+  String tailorId = "";
 
 
 
@@ -384,7 +387,7 @@ Widget _buildColorOption(Color color, String hexCode) {
 
 String Idcustomer = FirebaseAuth.instance.currentUser?.uid ?? 'default_user_id';
 
- void placeOrder(String userId, String tailorId, String modelId, List<String> colors, List<String> sizes, String initialPrice, String modifiedPrice, String note, String categoryId , int progress) async {
+ void placeOrder(String userId, String tailorId, String modelId, List<String> colors, List<String> sizes, String initialPrice, String modifiedPrice, String note, String categoryId , int progress , String imageUrl) async {
     try {
       Booking newBooking = Booking(
         id: FirebaseFirestore.instance.collection('bookings').doc().id,
@@ -400,6 +403,8 @@ String Idcustomer = FirebaseAuth.instance.currentUser?.uid ?? 'default_user_id';
         categoryId: categoryId,
         note: note,
         progress: 0,
+        imageUrl: imageUrl,
+        
       );
       Map<String, dynamic> bookingMap = {
         'userId': newBooking.userId,
@@ -414,6 +419,7 @@ String Idcustomer = FirebaseAuth.instance.currentUser?.uid ?? 'default_user_id';
         'categoryId': newBooking.categoryId,
         'note': newBooking.note,
         'progres': "0",
+        'imageUrl' : newBooking.imageUrl,
       };
       await FirebaseFirestore.instance.collection('bookings').add(bookingMap);
       print("Order placed successfully!");
@@ -475,22 +481,27 @@ String Idcustomer = FirebaseAuth.instance.currentUser?.uid ?? 'default_user_id';
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: Container(
-                width: double.infinity,
-                height: 300,
-                color: Colors.grey[300], 
-                child: Center(
-                  child: Text(
-                    "No Image Available",
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[700],
+            child: Container(
+              width: double.infinity,
+              height: 300,
+              color: Colors.grey[300],
+              child: widget.imageUrl != null && widget.imageUrl!.isNotEmpty
+                  ? Image.network(
+                      widget.imageUrl!,
+                      fit: BoxFit.cover,
+                    )
+                  : Center(
+                      child: Text(
+                        "No Image Available",
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[700],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
             ),
+),
             
             
             Padding(
@@ -506,6 +517,7 @@ String Idcustomer = FirebaseAuth.instance.currentUser?.uid ?? 'default_user_id';
                           builder: (context) => TailorProfilePage(
                             name: tailorName,
                             image: tailorProfileImage,
+                            tailorId: widget.tailorId,
                           ),
                         ),
                       );
@@ -646,39 +658,7 @@ Row(
                   SizedBox(
                     width: double.infinity,
 
-
-                    // child: ElevatedButton(
-                    //   onPressed: () {
-                        
-                    //     ScaffoldMessenger.of(context).showSnackBar(
-                    //       const SnackBar(
-                    //           content:
-                    //               Text("The product has been added to the cart")),
-                    //     );
-                    //   },
-                    //   style: ElevatedButton.styleFrom(
-                    //     backgroundColor:
-                    //         const Color.fromARGB(255, 163, 119, 178),
-                    //     padding: const EdgeInsets.symmetric(vertical: 16),
-                    //   ),
-                    //   child: Text("Order",
-                    //       style: GoogleFonts.poppins(
-                    //           fontSize: 20, color: Colors.white)),
-                    // ),
-
                      child: ElevatedButton(
-                      // onPressed: () {
-                      //   String userId = Idcustomer; 
-                      //   String tailorId = widget.tailorId;
-                      //   String modelId = widget.modelId;
-                      //   List<String> colors = _selectedColors;
-                      //   List<String> sizes = [_selectedSize];
-                      //   String initialPrice = widget.price; 
-                      //   String modifiedPrice = widget.price; 
-                      //   String note = _notesController.text;
-                      //   String categoryId = 'categoryId_value'; 
-                      //   placeOrder(userId, tailorId, modelId, colors, sizes, initialPrice, modifiedPrice, note, categoryId);
-                      // },
                       onPressed: () {
   String userId = Idcustomer;
   String tailorId = widget.tailorId;
@@ -690,6 +670,7 @@ Row(
   String note = _notesController.text;
   String categoryId = '6';
   int progress = 0;
+  String imageUrl = widget.imageUrl ?? '';
 
   print("🧾 Placing order with:");
   print("User ID: $userId");
@@ -701,7 +682,7 @@ Row(
   print("Note: $note");
 
 
-  placeOrder(userId, tailorId, modelId, colors, sizes, initialPrice, modifiedPrice, note, categoryId , progress);
+  placeOrder(userId, tailorId, modelId, colors, sizes, initialPrice, modifiedPrice, note, categoryId , progress , imageUrl);
 },
                       child: Text("Order"),
                     ),
